@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // "PASSENGER" or "DRIVER"
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Driver specific
+  isOnline     Boolean @default(false)
+  currentLat   Float?
+  currentLng   Float?
+  upiId        String? // For receiving payments
+  
+  // Relations
+  ridesAsPassenger Ride[] @relation("PassengerRides")
+  ridesAsDriver    Ride[] @relation("DriverRides")
+  vehicle          Vehicle?
+  ratingsReceived  Rating[] @relation("DriverRatings")
+}
+
+model Vehicle {
+  id           Int    @id @default(autoincrement())
+  driverId     Int    @unique
+  driver       User   @relation(fields: [driverId], references: [id])
+  model        String
+  licensePlate String
+  color        String
+}
+
+model Ride {
+  id               Int      @id @default(autoincrement())
+  passengerId      Int
+  passenger        User     @relation("PassengerRides", fields: [passengerId], references: [id])
+  driverId         Int?
+  driver           User?    @relation("DriverRides", fields: [driverId], references: [id])
+  
+  status           String   @default("REQUESTED") // "REQUESTED", "ACCEPTED", "IN_PROGRESS", "COMPLETED", "CANCELLED"
+  
+  pickupLat        Float
+  pickupLng        Float
+  pickupAddress    String
+  
+  destLat          Float
+  destLng          Float
+  destAddress      String
+  
+  fare             Float?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  rating           Rating?
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  rideId    Int      @unique
+  ride      Ride     @relation(fields: [rideId], references: [id])
+  driverId  Int
+  driver    User     @relation("DriverRatings", fields: [driverId], references: [id])
+  score     Int      // 1 to 5
+  feedback  String?
+  createdAt DateTime @default(now())
+}

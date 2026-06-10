@@ -8,20 +8,25 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String
-  role      String   // "PASSENGER" or "DRIVER"
-  phone     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  password     String
+  name         String
+  role         String   // "PASSENGER" or "DRIVER"
+  phone        String?
+  upiId        String?
+  gender       String?
+  profilePhoto String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Driver specific
-  isOnline     Boolean @default(false)
-  currentLat   Float?
-  currentLng   Float?
-  upiId        String? // For receiving payments
+  isOnline           Boolean @default(false)
+  currentLat         Float?
+  currentLng         Float?
+  nationalId         String? // KYC
+  driverLicense      String? // KYC
+  bankAccount        String? // KYC
   
   // Relations
   ridesAsPassenger Ride[] @relation("PassengerRides")
@@ -31,12 +36,14 @@ model User {
 }
 
 model Vehicle {
-  id           Int    @id @default(autoincrement())
-  driverId     Int    @unique
-  driver       User   @relation(fields: [driverId], references: [id])
-  model        String
-  licensePlate String
-  color        String
+  id               Int    @id @default(autoincrement())
+  driverId         Int    @unique
+  driver           User   @relation(fields: [driverId], references: [id])
+  type             String?
+  model            String
+  licensePlate     String
+  rcNumber         String?
+  color            String
 }
 
 model Ride {

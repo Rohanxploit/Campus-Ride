@@ -9,6 +9,10 @@ import PassengerDashboard from './pages/PassengerDashboard';
 import DriverDashboard from './pages/DriverDashboard';
 
 import Profile from './pages/Profile';
+import MyRides from './pages/MyRides';
+import Payments from './pages/Payments';
+import Settings from './pages/Settings';
+import Help from './pages/Help';
 import { Link } from 'react-router-dom';
 
 // Protected Route Component
@@ -63,6 +67,30 @@ function App() {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/history" element={
+              <ProtectedRoute>
+                <MyRides />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/payments" element={
+              <ProtectedRoute>
+                <Payments />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/help" element={
+              <ProtectedRoute>
+                <Help />
               </ProtectedRoute>
             } />
 

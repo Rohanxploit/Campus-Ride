@@ -113,7 +113,7 @@ exports.getActiveRide = async (req, res) => {
           { driverId: req.user.id },
         ],
         status: {
-          in: ["REQUESTED", "ACCEPTED", "IN_PROGRESS"],
+          in: ["REQUESTED", "ACCEPTED", "ARRIVED", "IN_PROGRESS"],
         },
       },
       include: {

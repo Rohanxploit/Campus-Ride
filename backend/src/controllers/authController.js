@@ -4,7 +4,7 @@ const prisma = require("../prismaClient");
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, name, role, phone, vehicle } = req.body;
+    const { email, password, name, role, phone, nationalId, driverLicense, bankAccount, vehicle } = req.body;
 
     // Check if user exists
     let user = await prisma.user.findUnique({ where: { email } });
@@ -24,6 +24,9 @@ exports.register = async (req, res) => {
         name,
         role,
         phone,
+        nationalId: role === "DRIVER" ? nationalId : null,
+        driverLicense: role === "DRIVER" ? driverLicense : null,
+        bankAccount: role === "DRIVER" ? bankAccount : null,
       },
     });
 
@@ -32,8 +35,10 @@ exports.register = async (req, res) => {
       await prisma.vehicle.create({
         data: {
           driverId: user.id,
+          type: vehicle.type,
           model: vehicle.model,
           licensePlate: vehicle.licensePlate,
+          rcNumber: vehicle.rcNumber,
           color: vehicle.color,
         },
       });
@@ -112,6 +117,9 @@ exports.getProfile = async (req, res) => {
         role: true,
         phone: true,
         isOnline: true,
+        nationalId: true,
+        driverLicense: true,
+        bankAccount: true,
         vehicle: true,
       },
     });

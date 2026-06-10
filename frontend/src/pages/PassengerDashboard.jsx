@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { SocketContext } from '../contexts/SocketContext';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { AuthContext } from '../contexts/AuthContext';
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -48,46 +49,46 @@ const destIcon = new L.Icon({
 });
 
 const center = {
-  lat: 29.864, // IIT Roorkee roughly
-  lng: 77.896
+  lat: 29.8664, // IIT Roorkee roughly
+  lng: 77.8962 ,
 };
 
 const CAMPUS_LOCATIONS = [
   // Gates
-  { name: 'Main Gate', lat: 29.8644, lng: 77.8965 },
-  { name: 'Century Gate', lat: 29.8633, lng: 77.8975 },
+  { name: 'IIT-R main gate', lat: 29.865505472476983, lng: 77.88952720679146 },
+  { name: 'Century Gate', lat: 29.868684, lng: 77.890146 },
   // Admin & Academics
-  { name: 'Thomason Building (Main Admin)', lat: 29.8649, lng: 77.8966 },
-  { name: 'Central Library', lat: 29.8655, lng: 77.8968 },
-  { name: 'LHC (Lecture Hall Complex)', lat: 29.8640, lng: 77.8980 },
-  { name: 'Computer Center (ICC)', lat: 29.8650, lng: 77.8950 },
+  { name: 'Thomason Building ', lat: 29.86510106145177, lng: 77.89647599289717 },
+  { name: 'Mahatma Gandhi Central Library', lat: 29.865387762203724, lng: 77.89503237915372 },
+  {name : "Gargi Block" , lat : 29.864831959744556,lng : 77.89389334792361} ,
+  { name: 'LHC (Lecture Hall Complex)', lat: 29.865627457077093, lng:77.89401604650786 },
+  { name: 'Computer Center (ICC)', lat: 29.862900600735525, lng:  77.89651568362869 },
   // Departments
-  { name: 'Department of Architecture', lat: 29.8625, lng: 77.8955 },
-  { name: 'Department of Civil Engineering', lat: 29.8645, lng: 77.8955 },
-  { name: 'Department of Computer Science', lat: 29.8650, lng: 77.8952 },
-  { name: 'Department of Electrical Engineering', lat: 29.8640, lng: 77.8965 },
-  { name: 'Department of ECE', lat: 29.8635, lng: 77.8960 },
-  { name: 'Department of Mechanical Engineering', lat: 29.8655, lng: 77.8955 },
-  { name: 'Department of Management Studies (DOMS)', lat: 29.8630, lng: 77.8930 },
+  { name: 'Department of Architecture', lat: 29.86361551273602, lng : 77.90010814012025},
+  { name: 'Department of Civil Engineering', lat: 29.862790479280296, lng :77.89857032662779 },
+  { name: 'Department of Computer Science', lat: 29.863395161150653,lng : 77.89576465927965 },
+  { name: 'Department of Electrical Engineering', lat: 29.863835914703376, lng :77.89698492700491},
+  { name: 'Department of ECE', lat: 29.86349436759449, lng :77.89581266525413 },
+  { name: 'Department of Mechanical Engineering', lat: 29.862898697228665,lng : 77.89720741303584},
+  { name: 'Department of Management Studies (DOMS)', lat: 29.864691854660716, lng :77.89482166235366 },
   // Hostels / Bhawans
-  { name: 'Azad Bhawan', lat: 29.8660, lng: 77.8975 },
-  { name: 'Cautley Bhawan', lat: 29.8610, lng: 77.8950 },
-  { name: 'Ganga Bhawan', lat: 29.8670, lng: 77.9000 },
-  { name: 'Govind Bhawan', lat: 29.8622, lng: 77.8970 },
-  { name: 'Jawahar Bhawan', lat: 29.8665, lng: 77.8990 },
-  { name: 'Kasturba Bhawan', lat: 29.8625, lng: 77.8985 },
+  { name: 'Azad Bhawan', lat: 29.865605543169202, lng : 77.89141515361283 },
+  { name: 'Cautley Bhawan', lat: 29.87073746386328,lng : 77.89538512319425 },
+  { name: 'Ganga Bhawan', lat: 29.87136753867186,lng : 77.89449251949233},
+  { name: 'Govind Bhawan', lat: 29.86230411427593, lng :77.894675545787 },
+  { name: 'Jawahar Bhawan', lat: 28.617859871766, lng : 77.21509247282665 },
+  { name: 'Kasturba Bhawan', lat: 29.86725260904434, lng : 77.90057431336534 },
   { name: 'Radhakrishnan Bhawan', lat: 29.8658, lng: 77.9015 },
-  { name: 'Rajendra Bhawan', lat: 29.8650, lng: 77.9020 },
-  { name: 'Rajiv Bhawan', lat: 29.8615, lng: 77.8995 },
-  { name: 'Ravindra Bhawan', lat: 29.8645, lng: 77.9005 },
-  { name: 'Sarojini Bhawan', lat: 29.8635, lng: 77.8990 },
+  { name: 'Rajendra Bhawan', lat: 29.8712538272342, lng : 77.89523427874697},
+  { name: 'Rajiv Bhawan', lat: 29.869819782931064,lng: 77.89498345743053 },
+  { name: 'Ravindra Bhawan', lat: 29.864481607752612, lng : 77.89250391806412 },
+
   // Facilities & Landmarks
-  { name: 'Hospital (Institute Wellness Centre)', lat: 29.8638, lng: 77.8942 },
-  { name: 'MAC (Multi Activity Centre)', lat: 29.8660, lng: 77.8940 },
-  { name: 'Student Club', lat: 29.8650, lng: 77.8945 },
-  { name: 'Sports Complex (LBS Ground)', lat: 29.8675, lng: 77.8950 },
-  { name: 'Hobbies Club', lat: 29.8665, lng: 77.8965 },
-  { name: 'Nescafe', lat: 29.8652, lng: 77.8962 }
+  { name: 'Hospital (Institute Wellness Centre)', lat: 29.86192089675348,lng : 77.89291843826923 },
+  { name: 'MAC (Multi Activity Centre)', lat: 29.870321421390848,    lng : 77.89619986710542 },
+  { name: 'Students Activity Centre - SAC', lat: 29.866556890672836,lng : 77.89983162662784 },
+  { name: 'LBS Stadium', lat:29.867384935496787,   lng : 77.89555082112474 },
+ 
 ];
 
 const passengerIcon = new L.DivIcon({
@@ -98,6 +99,7 @@ const passengerIcon = new L.DivIcon({
 });
 
 const PassengerDashboard = () => {
+  const { user } = useContext(AuthContext);
   const { socket } = useContext(SocketContext);
   const [activeRide, setActiveRide] = useState(null);
   const [drivers, setDrivers] = useState([]);
@@ -113,6 +115,7 @@ const PassengerDashboard = () => {
   const [showRating, setShowRating] = useState(false);
   const [ratingScore, setRatingScore] = useState(5);
   const [feedback, setFeedback] = useState('');
+  const [routeLine, setRouteLine] = useState(null);
 
   useEffect(() => {
     // Start tracking passenger live location
@@ -124,14 +127,14 @@ const PassengerDashboard = () => {
           const lng = pos.coords.longitude;
           setPassengerLocation({ lat, lng });
         },
-        (err) => console.error("Geolocation error:", err),
+        (err) => console.error(err),
         { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
     }
 
     const fetchActiveRide = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/rides/active');
+        const res = await axios.get(`http://${window.location.hostname}:5000/api/rides/active`);
         setActiveRide(res.data);
       } catch (err) {
         console.error(err);
@@ -140,7 +143,7 @@ const PassengerDashboard = () => {
     
     const fetchDrivers = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/rides/drivers');
+        const res = await axios.get(`http://${window.location.hostname}:5000/api/rides/drivers`);
         setDrivers(res.data);
       } catch (err) {
         console.error(err);
@@ -149,13 +152,14 @@ const PassengerDashboard = () => {
 
     fetchActiveRide();
     fetchDrivers();
+    const driverInterval = setInterval(fetchDrivers, 10000);
 
     if (socket) {
       socket.on('ride_accepted', (ride) => {
         setActiveRide(ride);
       });
       socket.on('ride_status_updated', (ride) => {
-        setActiveRide(ride);
+        setActiveRide(prev => prev ? { ...prev, ...ride } : ride);
         if (ride.status === 'COMPLETED') {
           setShowPayment(true);
         } else if (ride.status === 'CANCELLED') {
@@ -164,6 +168,12 @@ const PassengerDashboard = () => {
       });
       socket.on('driver_location_update', (data) => {
         setDrivers(prev => prev.map(d => d.id === data.driverId ? { ...d, currentLat: data.lat, currentLng: data.lng } : d));
+        setActiveRide(prev => {
+          if (prev && prev.driver && prev.driver.id === data.driverId) {
+            return { ...prev, driver: { ...prev.driver, currentLat: data.lat, currentLng: data.lng } };
+          }
+          return prev;
+        });
       });
       socket.on('driver_offline', (data) => {
         setDrivers(prev => prev.filter(d => d.id !== data.driverId));
@@ -171,6 +181,7 @@ const PassengerDashboard = () => {
     }
 
     return () => {
+      clearInterval(driverInterval);
       if (socket) {
         socket.off('ride_accepted');
         socket.off('ride_status_updated');
@@ -181,12 +192,46 @@ const PassengerDashboard = () => {
     };
   }, [socket]);
 
+  // Join the ride room whenever activeRide is set (handles page refreshes)
+  useEffect(() => {
+    if (socket && activeRide) {
+      socket.emit('join_ride_room', { rideId: activeRide.id });
+    }
+  }, [socket, activeRide]);
+
   // Emit passenger location periodically if they have an active ride
   useEffect(() => {
     if (socket && activeRide && activeRide.status !== 'COMPLETED' && activeRide.status !== 'CANCELLED' && passengerLocation) {
-      socket.emit('update_passenger_location', { rideId: activeRide.id, lat: passengerLocation.lat, lng: passengerLocation.lng });
+      socket.emit('update_passenger_location', {
+        rideId: activeRide.id,
+        lat: passengerLocation.lat,
+        lng: passengerLocation.lng
+      });
     }
-  }, [passengerLocation, activeRide, socket]);
+  }, [passengerLocation, activeRide?.id, activeRide?.status, socket]);
+
+  // Fetch Route from OSRM
+  useEffect(() => {
+    const fetchRoute = async () => {
+      if (activeRide && activeRide.status === 'IN_PROGRESS' && activeRide.driver && activeRide.driver.currentLat) {
+        try {
+          const res = await axios.get(`https://router.project-osrm.org/route/v1/driving/${activeRide.driver.currentLng},${activeRide.driver.currentLat};${activeRide.destLng},${activeRide.destLat}?overview=full&geometries=geojson`);
+          if (res.data.routes && res.data.routes[0]) {
+            const coords = res.data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+            setRouteLine(coords);
+          }
+        } catch (err) {
+          console.error("Failed to fetch route", err);
+          setRouteLine([[activeRide.driver.currentLat, activeRide.driver.currentLng], [activeRide.destLat, activeRide.destLng]]);
+        }
+      } else {
+        setRouteLine(null);
+      }
+    };
+    fetchRoute();
+    const interval = setInterval(fetchRoute, 10000);
+    return () => clearInterval(interval);
+  }, [activeRide?.status, activeRide?.destLat, activeRide?.destLng, activeRide?.driver?.currentLat, activeRide?.driver?.currentLng]);
 
   const requestRide = async (e) => {
     e.preventDefault();
@@ -217,7 +262,7 @@ const PassengerDashboard = () => {
         destLng: dLoc ? dLoc.lng : center.lng + (Math.random() - 0.5) * 0.01,
       };
       
-      const res = await axios.post('http://localhost:5000/api/rides/request', payload);
+      const res = await axios.post(`http://${window.location.hostname}:5000/api/rides/request`, payload);
       setActiveRide(res.data);
       
       if (socket) {
@@ -246,7 +291,12 @@ const PassengerDashboard = () => {
 
   const submitRating = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/rides/${activeRide.id}/rating`, { score: ratingScore, feedback });
+      if (activeRide) {
+        await axios.post(`http://${window.location.hostname}:5000/api/rides/${activeRide.id}/rating`, {
+          score: ratingScore,
+          feedback
+        });
+      }
       setShowRating(false);
       setActiveRide(null);
     } catch (err) {
@@ -272,13 +322,7 @@ const PassengerDashboard = () => {
             </Marker>
           )}
           
-          {drivers.map(driver => (
-            driver.currentLat && driver.currentLng && (
-              <Marker key={driver.id} position={[driver.currentLat, driver.currentLng]} icon={driverIcon}>
-                <Popup>{driver.name} (Driver)</Popup>
-              </Marker>
-            )
-          ))}
+
 
           {activeRide && (
             <>
@@ -290,6 +334,44 @@ const PassengerDashboard = () => {
               </Marker>
             </>
           )}
+
+          {/* Active Driver Marker */}
+          {activeRide && activeRide.driver && activeRide.driver.currentLat && activeRide.driver.currentLng && (
+            <Marker position={[activeRide.driver.currentLat, activeRide.driver.currentLng]} icon={driverIcon}>
+              <Popup>{activeRide.driver.name} (Your Driver)</Popup>
+            </Marker>
+          )}
+
+          {/* Route Line when IN_PROGRESS */}
+          {activeRide && activeRide.status === 'IN_PROGRESS' && routeLine && (
+            <>
+              {/* Outer dark blue border line */}
+              <Polyline 
+                positions={routeLine} 
+                color="#1e3a8a" 
+                weight={8} 
+                opacity={0.8}
+              />
+              {/* Inner bright blue animated line */}
+              <Polyline 
+                positions={routeLine} 
+                color="#3b82f6" 
+                weight={4} 
+                dashArray="10, 10"
+                className="animated-route"
+                opacity={1}
+              />
+            </>
+          )}
+
+          {/* Render Drivers when no active ride */}
+          {!activeRide && drivers.map(d => (
+            d.currentLat && d.currentLng && (
+              <Marker key={d.id} position={[d.currentLat, d.currentLng]} icon={driverIcon}>
+                <Popup>{d.name} (Driver)</Popup>
+              </Marker>
+            )
+          ))}
         </MapContainer>
       </div>
 
@@ -363,7 +445,7 @@ const PassengerDashboard = () => {
           <div>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem'}}>
               <h2 style={{fontSize: '1.5rem', margin: 0}}>
-                {activeRide.status === 'REQUESTED' ? 'Finding your driver...' : 'Driver is on the way'}
+                {activeRide.status === 'REQUESTED' ? 'Finding your driver...' : activeRide.status === 'IN_PROGRESS' ? 'Heading to destination' : 'Driver is on the way'}
               </h2>
               <span style={{
                 fontWeight: 'bold', 
@@ -398,10 +480,24 @@ const PassengerDashboard = () => {
               </div>
             )}
 
+            {(activeRide.status === 'ACCEPTED' || activeRide.status === 'ARRIVED') && (
+              <div style={{marginBottom: '1.5rem', padding: '1rem', backgroundColor: activeRide.status === 'ARRIVED' ? '#10b981' : 'var(--accent-primary)', color: 'white', borderRadius: 'var(--radius-md)', textAlign: 'center', transition: 'background-color 0.3s'}}>
+                <h3 style={{marginBottom: '0.5rem'}}>{activeRide.status === 'ARRIVED' ? '🛺 Driver has Arrived!' : 'Driver is on the way'}</h3>
+                <span style={{fontSize: '0.9rem', opacity: 0.9}}>Provide this OTP to start the ride</span>
+                <div style={{fontWeight: 'bold', fontSize: '2rem', letterSpacing: '4px', marginTop: '0.5rem'}}>
+                  {user ? (user.id * 7391).toString().slice(-4).padStart(4, '0') : '0000'}
+                </div>
+              </div>
+            )}
+
             <div style={{marginBottom: '1.5rem'}}>
               <div style={{display: 'flex', gap: '1rem', marginBottom: '0.5rem'}}>
                 <div style={{width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'var(--accent-success)', marginTop: '0.4rem'}}></div>
-                <p style={{margin: 0, color: 'var(--text-secondary)'}}>{activeRide.pickupAddress}</p>
+                <div>
+                  <p style={{fontWeight: 'bold', fontSize: '0.9rem'}}>Driver {activeRide.driver?.name} {activeRide.status === 'ARRIVED' ? 'has reached your location' : activeRide.status === 'IN_PROGRESS' ? 'is driving you to your destination' : 'is on the way'}</p>
+                  <p style={{fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.2rem'}}>{activeRide.driver?.vehicle?.model} • {activeRide.driver?.vehicle?.licensePlate}</p>
+                  <p style={{margin: 0, color: 'var(--text-secondary)'}}>{activeRide.pickupAddress}</p>
+                </div>
               </div>
               <div style={{borderLeft: '2px dashed var(--border-color)', height: '20px', marginLeft: '4px', marginBottom: '0.5rem'}}></div>
               <div style={{display: 'flex', gap: '1rem'}}>

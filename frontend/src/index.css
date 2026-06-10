@@ -259,3 +259,20 @@ body {
 .floating-card {
   animation: slideUpCenter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Smooth Leaflet Marker Animations (Google Maps Style) */
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  transition: transform 1s linear !important;
+}
+
+/* Animated Route Line */
+.animated-route {
+  animation: dashAnimation 20s linear infinite;
+}
+
+@keyframes dashAnimation {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}

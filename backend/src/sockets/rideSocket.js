@@ -26,6 +26,13 @@ module.exports = (io) => {
     // Join a room for their own ID to receive private messages
     socket.join(`user_${socket.user.id}`);
 
+    // Join ride room for reconnections
+    socket.on("join_ride_room", (data) => {
+      if (data && data.rideId) {
+        socket.join(`ride_${data.rideId}`);
+      }
+    });
+
     // Driver location updates
     socket.on("update_driver_location", async (data) => {
       if (socket.user.role === "DRIVER") {

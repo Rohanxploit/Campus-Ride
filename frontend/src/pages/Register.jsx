@@ -10,8 +10,13 @@ const Register = () => {
     password: '',
     role: 'PASSENGER',
     phone: '',
+    nationalId: '',
+    driverLicense: '',
+    bankAccount: '',
+    vehicleType: 'E-Rickshaw',
     vehicleModel: '',
     licensePlate: '',
+    rcNumber: '',
     color: ''
   });
   const [error, setError] = useState('');
@@ -30,9 +35,14 @@ const Register = () => {
       };
 
       if (formData.role === 'DRIVER') {
+        payload.nationalId = formData.nationalId;
+        payload.driverLicense = formData.driverLicense;
+        payload.bankAccount = formData.bankAccount;
         payload.vehicle = {
+          type: formData.vehicleType,
           model: formData.vehicleModel,
           licensePlate: formData.licensePlate,
+          rcNumber: formData.rcNumber,
           color: formData.color
         };
       }
@@ -74,21 +84,51 @@ const Register = () => {
           </div>
 
           {formData.role === 'DRIVER' && (
-            <div style={{padding: '1rem', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem'}}>
-              <h4 style={{marginBottom: '1rem', color: 'var(--text-secondary)'}}>Vehicle Details</h4>
-              <div className="input-group">
-                <label>Vehicle Model</label>
-                <input type="text" name="vehicleModel" value={formData.vehicleModel} onChange={onChange} required={formData.role === 'DRIVER'} />
+            <>
+              <div style={{padding: '1rem', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem', borderLeft: '4px solid var(--accent-primary)'}}>
+                <h4 style={{marginBottom: '1rem', color: 'var(--text-secondary)'}}>Driver Verification (KYC)</h4>
+                <div className="input-group">
+                  <label>National ID / Aadhaar</label>
+                  <input type="text" name="nationalId" value={formData.nationalId} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="XXXX-XXXX-XXXX" />
+                </div>
+                <div className="input-group">
+                  <label>Driver License Number</label>
+                  <input type="text" name="driverLicense" value={formData.driverLicense} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="DL-14-20230012345" />
+                </div>
+                <div className="input-group">
+                  <label>Bank Account Number</label>
+                  <input type="text" name="bankAccount" value={formData.bankAccount} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="Account Number for Payouts" />
+                </div>
               </div>
-              <div className="input-group">
-                <label>License Plate</label>
-                <input type="text" name="licensePlate" value={formData.licensePlate} onChange={onChange} required={formData.role === 'DRIVER'} />
+
+              <div style={{padding: '1rem', backgroundColor: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem', borderLeft: '4px solid #10b981'}}>
+                <h4 style={{marginBottom: '1rem', color: 'var(--text-secondary)'}}>Vehicle Registration</h4>
+                <div className="input-group">
+                  <label>Vehicle Type</label>
+                  <select name="vehicleType" value={formData.vehicleType} onChange={onChange} required={formData.role === 'DRIVER'}>
+                    <option value="E-Rickshaw">E-Rickshaw</option>
+                    <option value="Auto Rickshaw">Auto Rickshaw</option>
+                    <option value="Cab / Sedan">Cab / Sedan</option>
+                  </select>
+                </div>
+                <div className="input-group">
+                  <label>Vehicle Model / Brand</label>
+                  <input type="text" name="vehicleModel" value={formData.vehicleModel} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="e.g. Mahindra Treo" />
+                </div>
+                <div className="input-group">
+                  <label>Vehicle Number (License Plate)</label>
+                  <input type="text" name="licensePlate" value={formData.licensePlate} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="UK-08-XX-1234" />
+                </div>
+                <div className="input-group">
+                  <label>Vehicle Registration Number (RC)</label>
+                  <input type="text" name="rcNumber" value={formData.rcNumber} onChange={onChange} required={formData.role === 'DRIVER'} placeholder="RC Certificate Number" />
+                </div>
+                <div className="input-group">
+                  <label>Vehicle Color</label>
+                  <input type="text" name="color" value={formData.color} onChange={onChange} required={formData.role === 'DRIVER'} />
+                </div>
               </div>
-              <div className="input-group">
-                <label>Vehicle Color</label>
-                <input type="text" name="color" value={formData.color} onChange={onChange} required={formData.role === 'DRIVER'} />
-              </div>
-            </div>
+            </>
           )}
 
           <button type="submit" className="btn btn-primary" style={{width: '100%', marginTop: '1rem'}}>

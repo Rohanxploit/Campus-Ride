@@ -118,7 +118,7 @@ exports.getActiveRide = async (req, res) => {
       },
       include: {
         passenger: { select: { id: true, name: true, phone: true } },
-        driver: { select: { id: true, name: true, phone: true, vehicle: true } },
+        driver: { select: { id: true, name: true, phone: true, vehicle: true, currentLat: true, currentLng: true } },
       },
     });
 

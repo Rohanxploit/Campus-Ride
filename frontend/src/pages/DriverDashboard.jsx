@@ -249,6 +249,14 @@ const DriverDashboard = () => {
     }
   };
 
+  const cancelRide = () => {
+    if (socket && activeRide) {
+      socket.emit('cancel_ride_driver', { rideId: activeRide.id });
+      setActiveRide({ ...activeRide, status: 'CANCELLED' });
+      setTimeout(() => setActiveRide(null), 3000);
+    }
+  };
+
   // Geofencing calculation for ARRIVAL
   const getDistanceToPickup = () => {
     if (!activeRide || !driverLocation) return Infinity;
@@ -265,7 +273,7 @@ const DriverDashboard = () => {
   };
   
   const distanceToPickup = getDistanceToPickup();
-  const isNearPickup = distanceToPickup <= 200; // Within 200 meters
+  const isNearPickup = distanceToPickup <= 50; // Within 50 meters
 
   // Format ETA
   const formatETA = (durationSeconds) => {
@@ -555,6 +563,11 @@ const DriverDashboard = () => {
           {activeRide.status === 'IN_PROGRESS' && (
             <button onClick={() => updateRideStatus('COMPLETED')} className="btn btn-success" style={{width: '100%', padding: '1rem', fontSize: '1.1rem', marginTop: '1rem'}}>
               Complete Ride
+            </button>
+          )}
+          {activeRide.status !== 'COMPLETED' && activeRide.status !== 'CANCELLED' && (
+            <button onClick={cancelRide} className="btn btn-danger" style={{width: '100%', padding: '1rem', fontSize: '1rem', marginTop: '1rem'}}>
+              Cancel Ride
             </button>
           )}
         </div>

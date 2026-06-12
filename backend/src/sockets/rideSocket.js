@@ -72,7 +72,7 @@ module.exports = (io) => {
             const updatedRide = await prisma.ride.update({
               where: { id: rideId },
               data: { status: "ACCEPTED", driverId: socket.user.id },
-              include: { driver: { select: { name: true, phone: true, vehicle: true } } },
+              include: { driver: { select: { name: true, phone: true, vehicle: true, currentLat: true, currentLng: true } } },
             });
 
             // Notify the passenger
@@ -133,6 +133,25 @@ module.exports = (io) => {
           onlineDrivers.forEach(driver => {
             io.to(`user_${driver.id}`).emit("ride_cancelled_by_passenger", { rideId });
           });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    // Cancel ride (Driver)
+    socket.on("cancel_ride_driver", async (data) => {
+      const { rideId } = data;
+      try {
+        const ride = await prisma.ride.findUnique({ where: { id: rideId } });
+        if (ride && ride.driverId === socket.user.id && ride.status !== "COMPLETED") {
+          const updatedRide = await prisma.ride.update({
+            where: { id: rideId },
+            data: { status: "CANCELLED" },
+          });
+
+          // Notify everyone in the ride room
+          io.to(`ride_${rideId}`).emit("ride_status_updated", updatedRide);
         }
       } catch (err) {
         console.error(err);

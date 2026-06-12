@@ -1,8 +1,4 @@
 # Campus Ride: System Design Document
-
-**Format intended for:** PDF Generation
-**Target Length:** Maximum 8 Pages
-
 ---
 
 ## 1. Problem Understanding

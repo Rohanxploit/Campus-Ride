@@ -364,8 +364,8 @@ const PassengerDashboard = () => {
             </>
           )}
 
-          {/* Render Drivers when no active ride */}
-          {!activeRide && drivers.map(d => (
+          {/* Render Drivers when no assigned driver */}
+          {(!activeRide || !activeRide.driver) && drivers.map(d => (
             d.currentLat && d.currentLng && (
               <Marker key={d.id} position={[d.currentLat, d.currentLng]} icon={driverIcon}>
                 <Popup>{d.name} (Driver)</Popup>
